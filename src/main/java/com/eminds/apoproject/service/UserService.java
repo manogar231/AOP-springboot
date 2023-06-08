@@ -32,7 +32,6 @@ public class UserService {
 		users.setPassword(userdto.getPassword());
 		return userRepository.save(users);
 	}
-
 	public Userdto findUserById(int id) {
 		Optional<User> user = userRepository.findById(id);
 		if (user.isEmpty()) { 

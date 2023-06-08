@@ -1,42 +1,41 @@
 package com.eminds.apoproject.util;
 
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
+import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
-
 @Aspect
-@Configuration
 @Component
 @Slf4j
 public class Aspectdemo {
-  
+ 
+	@Pointcut("@annotation(PrintOne) && args(..)")
+	public void pointcut() {}
 	
-	@Autowired
-	HttpServletRequest servletRequest;
-	
-	@Before(value = "@annotation(PrintOne) && args(..)")
-	public void before_aspectExceution(JoinPoint joinPoint) {
-		 if (servletRequest == null) {
-	            throw new RuntimeException("request should be HttpServletRequestType");
-	        }
+	@Before(value = "pointcut()")
+	public void before_aspectExecution(JoinPoint joinPoint){
         String name=joinPoint.getSignature().getName();
-        log.info("Before Method exceuted successfully ::"+name);
+        String args=joinPoint.getArgs().toString(); 
+        log.info("Before Method exceuted successfully ::"+name+" "+"::"+args);
 	} 
-	
-	@After(value = "@annotation(PrintOne) && args(..)")
-	public void after_aspectExceution(JoinPoint joinPoint) {
+	@After(value = "pointcut()")
+	public void after_aspectExecution(JoinPoint joinPoint) {
 	String afterjoinpointname=joinPoint.getSignature().getName();
 		log.info("After Method Exceuted ::" + afterjoinpointname);
+	}
+	@AfterReturning(value = "@annotation(PrintOne)&& args(..)" , returning = "object")
+	public void afterreturning_aspect(Object object) {
+		log.info("This is from After Returing  " +" :: " + object);
+	}
+	@AfterThrowing(value = "@annotation(PrintOne)&& args(..)" , throwing = "exception")
+	public void afterthrowing(Throwable exception) {
+		log.info("This is from After throwing"+ " :: " + exception);
 	}
 }
